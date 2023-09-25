@@ -1,10 +1,9 @@
-package com.SpringTutorial.programming.service.service;
+package com.LondonApiTest.service;
 
 
-import com.SpringTutorial.programming.service.dto.PersonRequest;
-import com.SpringTutorial.programming.service.dto.PersonResponse;
-import com.SpringTutorial.programming.service.model.Person;
-import com.SpringTutorial.programming.service.repository.LondonerRepository;
+import com.LondonApiTest.dto.PersonResponse;
+import com.LondonApiTest.dto.PersonRequest;
+import com.LondonApiTest.model.Person;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,8 +22,6 @@ public class LondonService {
     private static final double[] centerCoordsRads = {Math.toRadians(51.5080),Math.toRadians(0.1281)};//[0]lat, [1]long
 
     private static final double earthRaduisMiles = 3958.8;
-
-    private final LondonerRepository londonerRepository;
 
     public Person mapToPerson(PersonRequest personRequest){
         return Person.builder()
@@ -49,26 +46,11 @@ public class LondonService {
                 .longitude(person.getLongitude())
                 .build();
     }
-
-    public void addPersonDatabase(PersonRequest personRequest){
-        Person person = Person.builder()
-                        .id(personRequest.getId())
-                        .first_name(personRequest.getFirst_name())
-                        .last_name(personRequest.getLast_name())
-                        .email(personRequest.getEmail())
-                        .ip_address(personRequest.getIp_address())
-                        .latitude(personRequest.getLatitude())
-                        .longitude(personRequest.getLongitude())
-                        .build();
-
-        londonerRepository.save(person);
-    }
     public Flux<Person> mapToPersonMono(Mono<List<PersonRequest>> people){
         return people.flatMapMany(dataList-> Flux.fromIterable(dataList).map(this::mapToPerson));
     }
 
     public Mono<List<PersonResponse>> findLondonders(Mono<List<PersonRequest>> listedInCity, Mono<List<PersonRequest>> allPeople){
-
         Flux<Person> inCityFlux= mapToPersonMono(listedInCity);
 
         Flux<Person> allPeopleFlux = mapToPersonMono(allPeople);
@@ -76,7 +58,6 @@ public class LondonService {
         Flux<Person> filteredPeopleFlux = allPeopleFlux.filter(person -> withinRadius(person.getLatitude(), person.getLongitude()));
 
         Flux<PersonResponse> londoners = filteredPeopleFlux.concatWith(inCityFlux).map(this::mapToPersonResponse);
-
 
         return londoners.collectList();
     }
@@ -95,12 +76,6 @@ public class LondonService {
         double distance = earthRaduisMiles * c;
 
         return distance <= radius;
-    }
-
-    public List<PersonResponse> getAllPeople() {
-        List<Person> people = londonerRepository.findAll();
-
-        return people.stream().map(this::mapToPersonResponse).toList();
     }
 
 

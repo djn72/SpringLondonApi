@@ -1,20 +1,16 @@
-package com.SpringTutorial.programming.service.model;
+package com.LondonApiTest.dto;
 
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(value="person")
+@Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-@Data
-public class Person {
-    @Id
+public class PersonRequest {
     private String id;
     private String first_name;
     private String last_name;
@@ -22,6 +18,5 @@ public class Person {
     private String ip_address;
     private double latitude;
     private double longitude;
-
 
 }

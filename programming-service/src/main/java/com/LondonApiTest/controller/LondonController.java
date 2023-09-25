@@ -1,11 +1,10 @@
-package com.SpringTutorial.programming.service.controller;
+package com.LondonApiTest.controller;
 
-import com.SpringTutorial.programming.service.dto.PersonRequest;
-import com.SpringTutorial.programming.service.dto.PersonResponse;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.LondonApiTest.dto.PersonRequest;
+import com.LondonApiTest.dto.PersonResponse;
+import com.LondonApiTest.service.LondonService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,10 +14,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import com.SpringTutorial.programming.service.service.LondonService;
-
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 
@@ -32,12 +27,9 @@ public class LondonController {
     private final WebClient.Builder webClientBuilder;
     ObjectMapper objectMapper = new ObjectMapper();
     private final LondonService londonService;
-
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<PersonResponse> getAllLondonPeople(){
-
-
 
         Mono<List<PersonRequest>> cityList = monoToPersonRequest(getCity("London"));
 
@@ -47,7 +39,6 @@ public class LondonController {
 
         return londonerList.block();
     }
-
     public Mono<List<PersonRequest>> monoToPersonRequest(Mono<String> mono){
         Flux<PersonRequest> personFlux = mono.flatMapMany( json -> {
             try {
@@ -74,15 +65,6 @@ public class LondonController {
                 .uri(baseApi + "city/" + city + "/users" )
                 .retrieve()
                 .bodyToMono(String.class);
-    }
-
-    public Mono<String> getIndividual(String id){
-        return webClientBuilder.build()
-                .get()
-                .uri(baseApi + "user/" + id)
-                .retrieve()
-                .bodyToMono(String.class);
-
     }
 
 }
