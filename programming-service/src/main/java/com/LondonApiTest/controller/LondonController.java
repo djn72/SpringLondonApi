@@ -31,15 +31,18 @@ public class LondonController {
     @ResponseStatus(HttpStatus.OK)
     public List<PersonResponse> getAllLondonPeople(){
 
-        Mono<List<PersonRequest>> cityList = monoToPersonRequest(getCity("London"));
+        Mono<List<PersonRequest>> cityList = mapJsonToPersonRequest(getCity("London"));
 
-        Mono<List<PersonRequest>> allPeopleList = monoToPersonRequest(getAllUsers());
+        Mono<List<PersonRequest>> allPeopleList = mapJsonToPersonRequest(getAllUsers());
 
         Mono<List<PersonResponse>> londonerList = londonService.findLondonders(cityList,allPeopleList);
 
         return londonerList.block();
     }
-    public Mono<List<PersonRequest>> monoToPersonRequest(Mono<String> mono){
+
+    //Maps all the JSON that was sent by the API into PersonRequest objects
+    //Using the PersonRequest objects to avoid exposing service to api directly
+    public Mono<List<PersonRequest>> mapJsonToPersonRequest(Mono<String> mono){
         Flux<PersonRequest> personFlux = mono.flatMapMany( json -> {
             try {
                 return Flux.fromArray(objectMapper.readValue(json,PersonRequest[].class));
@@ -51,6 +54,8 @@ public class LondonController {
 
     }
 
+
+    //These functions are what call the London Api itself, they return the JSON data stored in a Mono<String>
     public Mono<String> getAllUsers(){
         return webClientBuilder.build()
                 .get()

@@ -16,7 +16,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class LondonService {
-
     private static final int radius = 50;
 
     private static final double[] centerCoordsRads = {Math.toRadians(51.5080),Math.toRadians(0.1281)};//[0]lat, [1]long
@@ -34,7 +33,6 @@ public class LondonService {
                 .longitude(personRequest.getLongitude())
                 .build();
     }
-
     private PersonResponse mapToPersonResponse(Person person) {
         return PersonResponse.builder()
                 .id(person.getId())
@@ -46,6 +44,7 @@ public class LondonService {
                 .longitude(person.getLongitude())
                 .build();
     }
+
     public Flux<Person> mapToPersonMono(Mono<List<PersonRequest>> people){
         return people.flatMapMany(dataList-> Flux.fromIterable(dataList).map(this::mapToPerson));
     }
@@ -77,6 +76,4 @@ public class LondonService {
 
         return distance <= radius;
     }
-
-
 }
