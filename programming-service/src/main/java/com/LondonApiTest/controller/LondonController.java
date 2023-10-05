@@ -1,10 +1,12 @@
 package com.LondonApiTest.controller;
 
+import com.LondonApiTest.SpringConfig;
 import com.LondonApiTest.dto.PersonRequest;
 import com.LondonApiTest.dto.PersonResponse;
 import com.LondonApiTest.service.LondonService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,7 +25,8 @@ import java.util.List;
 @RequestMapping("api/London")
 @RequiredArgsConstructor
 public class LondonController {
-    private final String baseApi = "https://london-api.onrender.com/";
+
+    private final SpringConfig springConfig;
     private final WebClient.Builder webClientBuilder;
     ObjectMapper objectMapper = new ObjectMapper();
     private final LondonService londonService;
@@ -59,7 +62,7 @@ public class LondonController {
     public Mono<String> getAllUsers(){
         return webClientBuilder.build()
                 .get()
-                .uri(baseApi + "users")
+                .uri(springConfig.getBaseApi() + "/users")
                 .retrieve()
                 .bodyToMono(String.class);
     }
@@ -67,7 +70,7 @@ public class LondonController {
     public Mono<String> getCity(String city){
         return webClientBuilder.build()
                 .get()
-                .uri(baseApi + "city/" + city + "/users" )
+                .uri(springConfig.getBaseApi() + "/city/" + city + "/users" )
                 .retrieve()
                 .bodyToMono(String.class);
     }
